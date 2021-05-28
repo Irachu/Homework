@@ -1,0 +1,137 @@
+class Car {
+    let mark: String
+    var engineState: Bool
+    var windowStase: Bool
+    
+    static var carCount = 0
+    
+    init(mark: String, engineState: Bool, windowState: Bool) {
+        self.mark = mark
+        self.engineState = engineState
+        self.windowStase = windowState
+        
+        Car.carCount += 1
+    }
+    
+    enum Action {
+        case startEngine
+        case stopEngine
+        case openWindows
+        case closeWindows
+    }
+    
+    func makeAction(action: Action) {
+        switch action {
+        case .startEngine:
+            engineState = true
+            print("Двигатель запущен")
+        case .stopEngine:
+            engineState = false
+            print("Двигатель запущен")
+        case .openWindows:
+            windowStase = true
+            print("Окна открыты")
+        case .closeWindows:
+            windowStase = false
+            print("Окна закрыты")
+        }
+    }
+    static func carCountInfo () {
+        print("Выпущено автомобилей \(carCount)")
+    }
+}
+
+var Car1 = Car(mark: "Honda", engineState: false, windowState: false)
+Car1.makeAction(action: .openWindows)
+Car.carCountInfo()
+
+
+enum Riders: String {
+    case rai = "Kimi Raikkonen"
+    case ham = "Lewis Hamilton"
+    case bot = "Valtteri Bottas"
+}
+
+class SportCar: Car {
+    let engineVolume: Double = 1.6
+    var riderName: String
+        
+    init(mark: String, engineState: Bool, windowState: Bool, engineVolume: Double, riderName: Riders) {
+        self.riderName = riderName.rawValue
+        super.init(mark: mark, engineState: engineState, windowState: windowState)
+    }
+    
+    func changeRider(newRider: Riders) {
+        riderName = newRider.rawValue
+        print("""
+              Произошла смена пилота у болида марки \(mark). Новый пилот: \(riderName)
+              """)
+    }
+    // Отобразить характеристики болида:
+    func printCharacteristics() {
+            print("""
+                Марка машины: \(mark)
+                Объем двигателя: \(engineVolume)
+                Состояние двигателя: \(engineState)
+                Окна: \(windowStase)
+                Имя пилота: \(riderName)
+              """
+            )
+    }
+}
+
+var hondaSportCar = SportCar(mark: "Honda", engineState: true, windowState: false, engineVolume: 1.6, riderName: .bot)
+
+hondaSportCar.changeRider(newRider: .ham)
+hondaSportCar.makeAction(action: .stopEngine)
+hondaSportCar.printCharacteristics()
+
+class TrunkCar: Car {
+    let bodyVolume: Int
+    var filledBodyVolume: Int
+    
+    init(mark: String, engineState: Bool, windowState: Bool, bodyVolume: Int, filledBodyVolume: Int) {
+        self.bodyVolume = bodyVolume
+        self.filledBodyVolume = filledBodyVolume
+        super.init(mark: mark, engineState: engineState, windowState: windowState)
+    }
+    
+    // Добавить либо выгрузить груз:
+    func addCArgo(to: Int) {
+        if to < to + self.filledBodyVolume || to < self.bodyVolume {
+            filledBodyVolume += to
+            let remainder = bodyVolume - filledBodyVolume
+            print("После загрузки груза объемом \(to) общий объем груза в кузове составляет \(filledBodyVolume). Осталось заполнить на: \(remainder)")
+        } else {
+            fatalError("Невозможно загрузить груз так как недостаточно места в кузове")
+        }
+    }
+    func unloadCargo(to: Int) {
+        if to <= self.filledBodyVolume {
+            filledBodyVolume -= to
+            let remainder = bodyVolume - filledBodyVolume
+            print("После выгрузки груза объемом \(to) общий объем груза в кузове составляет \(filledBodyVolume). Осталось заполнить на: \(remainder)")
+        } else {
+            fatalError("Невозможно выгрузить груз, потому что Вы хотите вытащить больше, чем там есть. Там есть всего лишь: \(filledBodyVolume)")
+        }
+    }
+    func printCharacteristics() {
+            print("""
+                Марка машины: \(mark)
+                Состояние двигателя: \(engineState)
+                Окна: \(windowStase)
+                Объем кузова: \(bodyVolume)
+                Объем груза в кузове: \(filledBodyVolume)
+              """
+            )
+    }
+}
+
+var catTrunkCar1 = TrunkCar(mark: "CAT-1", engineState: true, windowState: false, bodyVolume: 50, filledBodyVolume: 5)
+var catTrunkCar2 = TrunkCar(mark: "CAT-2", engineState: true, windowState: false, bodyVolume: 30, filledBodyVolume: 30)
+var catTrunkCar3 = TrunkCar(mark: "CAT-3", engineState: true, windowState: false, bodyVolume: 20, filledBodyVolume: 0)
+
+Car.carCountInfo()
+catTrunkCar1.addCArgo(to: 40)
+catTrunkCar2.unloadCargo(to: 30)
+catTrunkCar1.printCharacteristics()
