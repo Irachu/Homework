@@ -1,0 +1,184 @@
+/: A UIKit based Playground for presenting user interface
+  
+import UIKit
+
+protocol CarCreate: class { // Почему выходит текст "Using 'class' keyword for protocol inheritance is deprecated; use 'AnyObject' instead"?
+    var yearOfIssue: Int { get }
+    var engineState: EngineState { get set }
+    var doorStase: DoorState { get set }
+}
+
+extension CarCreate {
+    
+    func engineStateOn() {
+        engineState = .on
+        print(self.engineState.rawValue)
+    }
+    
+    func engineStateOff() {
+        engineState = .off
+        print(self.engineState.rawValue)
+    }
+}
+
+extension CarCreate {
+    func openDoor() {
+        self.doorStase = .open
+        print(self.doorStase.rawValue)
+        
+    func closeDoor() {
+        self.doorStase = .closed
+        print(self.doorStase.rawValue)
+        }
+    }
+}
+
+// Перечисления. При вводе их протоколе выходила ошибка "Type 'DoorState' cannot be nested in protocol 'CarCreate'" Почему?
+enum DoorState: String {
+    case open = "Двери открыты"
+    case closed = "Двери закрыты"
+    
+}
+
+enum EngineState: String {
+    case on = "Двигатель запущен"
+    case off = "Двигатель отключен"
+    
+}
+
+class SportCar: CarCreate {
+    
+    enum Riders: String {
+        case rai = "Kimi Raikkonen"
+        case ham = "Lewis Hamilton"
+        case bot = "Valtteri Bottas"
+        case vet = "Sebastian Vettel"
+    }
+    
+    enum Teams: String {
+        case Ferrari = "Scuderia Ferrari"
+        case Mercedes = "Mercedes AMG Petronas"
+        case Marussia = "Marussia T_T"
+    }
+    
+    var yearOfIssue: Int
+    var engineState: EngineState
+    var doorStase: DoorState
+    var riderName: Riders
+    let team: Teams
+    
+    init(yearOfIssue: Int, engineState: EngineState, doorState: DoorState, riderName: Riders, team: Teams) {
+        self.yearOfIssue = yearOfIssue
+        self.engineState = engineState
+        self.doorStase = doorState
+        self.riderName = riderName
+        self.team = team
+    }
+    
+}
+
+extension SportCar {
+    func changeRider(newRider: Riders) {
+        self.riderName = newRider
+        print("""
+              Произошла смена пилота у болида марки \(team.rawValue). Новый пилот: \(riderName.rawValue)
+              """)
+}
+}
+
+extension SportCar: CustomStringConvertible {
+    var description: String {
+        return(
+            """
+            Характеристики болида:
+            Год выпуска: \(yearOfIssue)
+            Состояние двигателя: \(engineState.rawValue)
+            Состояние дверей: \(doorStase.rawValue)
+            Имя пилота: \(riderName.rawValue)
+            Команда: \(team.rawValue)
+            """)
+    }
+}
+
+var sportCarMercedes = SportCar(yearOfIssue: 2020, engineState: .off, doorState: .open, riderName: .rai, team: .Ferrari)
+print(sportCarMercedes)
+
+protocol Trunk {
+    var filledBodyVolume: Int {get set}
+    
+    func addCArgo(to: Int)
+    func unloadCargo(to: Int)
+    
+}
+
+class TrunkCAr: CarCreate, Trunk {
+    
+    enum CarMake: String {
+        case cat = "CAT"
+        case hitachi = "HITACHI"
+    }
+    
+    let carMake: CarMake
+    var yearOfIssue: Int
+    var engineState: EngineState
+    var doorStase: DoorState
+    let bodyVolume: Int
+    var filledBodyVolume: Int
+    
+    
+    init(carmake: CarMake, yearOfIssue: Int, bodyVolume: Int, filledBodyVolume: Int) {
+        self.carMake = carmake
+        self.yearOfIssue = yearOfIssue
+        self.bodyVolume = bodyVolume
+        self.filledBodyVolume = filledBodyVolume
+        self.engineState = .off
+        self.doorStase = .closed
+    }
+    
+    func addCArgo(to: Int) {
+            if to < to + self.filledBodyVolume || to < self.bodyVolume {
+                filledBodyVolume += to
+                let remainder = bodyVolume - filledBodyVolume
+                print("После загрузки груза объемом \(to) общий объем груза в кузове составляет \(filledBodyVolume). Осталось заполнить на: \(remainder)")
+            } else {
+                fatalError("Невозможно загрузить груз так как недостаточно места в кузове")
+            }
+        }
+    
+    func unloadCargo(to: Int) {
+            if to <= self.filledBodyVolume {
+                filledBodyVolume -= to
+                let remainder = bodyVolume - filledBodyVolume
+                print("После выгрузки груза объемом \(to) общий объем груза в кузове составляет \(filledBodyVolume). Осталось заполнить на: \(remainder)")
+            } else {
+                fatalError("Невозможно выгрузить груз, потому что Вы хотите вытащить больше, чем там есть. Там есть всего лишь: \(filledBodyVolume)")
+            }
+        }
+}
+
+extension TrunkCAr: CustomStringConvertible {
+    var description: String {
+        return(
+            """
+            Характеристики грузовика:
+            Год выпуска: \(yearOfIssue)
+            Состояние двигателя: \(engineState.rawValue)
+            Состояние дверей: \(doorStase.rawValue)
+            Марка: \(carMake.rawValue)
+            Объем кузова: \(bodyVolume)
+            Объем груза в кузове: \(filledBodyVolume)
+            """
+        )
+    }
+    
+    
+}
+
+var trunkCarCat = TrunkCAr(carmake: .cat, yearOfIssue: 2002, bodyVolume: 50, filledBodyVolume: 10)
+print(trunkCarCat)
+trunkCarCat.addCArgo(to: 20)
+trunkCarCat.unloadCargo(to: 30)
+
+var sportCarFerrari = SportCar(yearOfIssue: 2017, engineState: .off, doorState: .open, riderName: .rai, team: .Ferrari)
+sportCarFerrari.changeRider(newRider: .vet)
+sportCarFerrari.openDoor() // Почему не получается завести команду closeDoor? все команды есть кроме него
