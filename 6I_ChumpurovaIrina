@@ -1,0 +1,83 @@
+import Foundation
+
+struct Pilots {
+    var name: String
+    var age: Int
+}
+
+extension Pilots: CustomStringConvertible {
+    var description : String {
+        return "Name: \(name), Age: \(age)"
+    }
+}
+
+
+struct Place <T> {
+    private var elements: [T] = []
+    
+    public var none: Bool {
+        return elements.count == 0
+    }
+    
+    mutating func addPilot(element: T) {
+        elements.append(element)
+    }
+    mutating func removePilot()->T {
+        return elements.removeLast()
+    }
+    
+    public var first: T? {
+        if none {
+            print("The elemnets aren't found. Array is empty.")
+            return nil
+        } else {
+            print("Last element is \(elements.last!)")
+            return elements.last
+        }
+    }
+    
+    public var last: T? {
+        if none {
+            print("The elemnets aren't found. Array is empty.")
+            return nil
+        } else {
+            print("First element is \(elements.first!)")
+            return elements.first
+        }
+    }
+    
+    func printPlace() {
+        print(elements)
+    }
+}
+
+extension Place {
+    func myFilter(predicate:(T) -> Bool) -> [T] {
+        var total = [T]()
+        for i in elements {
+            if predicate(i) {
+                total.append(i)
+            }
+        }
+        return total
+    }
+}
+
+var pilots2021 = Place<Pilots>()
+pilots2021.addPilot(element: .init(name: "Lewis Hamilton", age: 36))
+pilots2021.addPilot(element: .init(name: "Valtteri Bottas", age: 31))
+pilots2021.addPilot(element: .init(name: "Charles Leclerc", age: 23))
+pilots2021.addPilot(element: .init(name: "Carlos Sainz", age: 26))
+pilots2021.addPilot(element: .init(name: "Max Verstappen", age: 23))
+pilots2021.addPilot(element: .init(name: "Checo Pérez", age: 31))
+pilots2021.addPilot(element: .init(name: "Kimi Raikkonen", age: 41))
+
+pilots2021.printPlace()
+pilots2021.first
+pilots2021.last
+
+let oldPilots = pilots2021.myFilter(predicate: {$0.age >= 35})
+print(oldPilots)
+
+
+
