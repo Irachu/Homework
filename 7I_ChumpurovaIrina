@@ -1,0 +1,99 @@
+import UIKit
+import PlaygroundSupport
+
+// Позиции в магазине книг
+struct Item {
+    var price: Int
+    var count: Int
+    let product: Product
+}
+
+// Товар
+struct Product {
+    let name: String
+}
+
+// Интернет-магазин
+class Bookmarket {
+    // Возможные ошибки
+    enum MaybeError: Error {            // Ошибки автомата
+
+        case invalidName                    // Нет в ассортименте
+        case outOfStock                          // Нет в наличии
+        case noMoney(coinsNeeded: Int) // Недостаточно денег, передаем недостаточную сумму
+        
+        var localizedDescription: String {
+            switch self {
+            case .invalidName:
+                return "Нет такого автора"
+            case .outOfStock:
+                return "Нет в наличии"
+            case .noMoney(coinsNeeded: let coinsNeeded):
+                return "Недостаточно денег: \(coinsNeeded)"
+            }
+        }
+    }
+
+    // Склад
+    var inventory = [
+        "Charles Bukowski": Item(price: 160, count: 5, product: Product(name: "Charles Bukowski")),
+        "Donna Tartt": Item(price: 50, count: 10, product: Product(name: "Donna Tartt")),
+        "Frank Tilie": Item(price: 60, count: 0, product: Product(name: "Frank Tilie"))
+    ]
+    
+    // Количество денег, запланированное на подарок
+    var deposite = 150
+    
+    // Продаем товар
+    func toBuy(itemNamed name: String) -> (product: Product?, error: MaybeError?) { // Возвращаем кортеж из товара и ошибки
+        // Если наша машина не знает такого товара вообще
+        guard let item = inventory[name] else {
+            // Возвращаем nil вместо продукта и ошибку
+            return (product: nil, error: MaybeError.invalidName)
+        }
+        
+        // Если товара нет в наличии
+        guard item.count > 0 else {
+            // Возвращаем nil вместо продукта и ошибку
+            return (product: nil, error: MaybeError.outOfStock)
+        }
+        
+        // Если недостаточно денег
+        guard item.price <= deposite else {
+            // Возвращаем nil вместо продукта и ошибку
+            return (product: nil, error: MaybeError.noMoney(coinsNeeded: item.price - deposite))
+        }
+        
+        // Продаем книгу
+        deposite -= item.price
+        var newItem = item
+        newItem.count -= 1
+        inventory[name] = newItem
+        // Возвращаем nil
+        return (product: newItem.product, error: nil)
+    }
+    
+}
+
+let person1 = Bookmarket()
+let buy1 = person1.toBuy(itemNamed: "Journal")
+let buy2 = person1.toBuy(itemNamed: "Charles Bukowski")
+let buy3 = person1.toBuy(itemNamed: "Donna Tartt")
+
+if let product = buy1.product {
+    print("Мы купили: \(product.name)")
+} else if let error = buy1.error {
+    print("Произошла ошибка: \(error.localizedDescription)")
+}
+
+if let product = buy2.product {
+    print("Мы купили: \(product.name)")
+} else if let error = buy2.error {
+    print("Произошла ошибка: \(error.localizedDescription)")
+}
+
+if let product = buy3.product {
+    print("Мы купили: \(product.name)")
+} else if let error = buy3.error {
+    print("Произошла ошибка: \(error.localizedDescription)")
+}
